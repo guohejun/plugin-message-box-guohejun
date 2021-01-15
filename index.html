@@ -8,7 +8,10 @@
 </body>
 <script src="message-box.js"></script>
 <script>
-  let dialog = new MessageBox({});
+  let dialog = new MessageBox({
+    type: "message",
+    showMask: false
+  });
   dialog.show();
 </script>
 </html>

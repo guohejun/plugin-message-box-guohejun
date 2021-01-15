@@ -1,10 +1,10 @@
 ;(function (undefined) {
 	"use strict";
-	let _global;
+	var _global;
 	
 	// 对象合并
 	function extend(o,n,override) {
-		for(let key in n){
+		for(var key in n){
 			if(n.hasOwnProperty(key) && (!o.hasOwnProperty(key) || override)){
 				o[key]=n[key];
 			}
@@ -18,7 +18,8 @@
 	MessageBox.prototype = {
 		constructor: this,
 		_init: function (opt) {
-			let options = {
+			var options = {
+				type: "messageBox", //message/messageBox
 				className: "",
 				title: "提示",
 				titleAlign: "center",
@@ -27,25 +28,31 @@
 				showConfirm: true,
 				confirmText: "确定",
 				showCancel: false,
-				cancelText: "取消"
+				cancelText: "取消",
+				showMask: true
 			};
 			
 			this.options = extend(options, opt, true);
 			this.hasDom = false;
-			this.tpl = `
-				<div class="plugin-message-box-mask-guohejun"></div>
-				<div class="plugin-message-box-guohejun ${this.options.className}">
-	        <div class="pmb-header ${this.options.titleAlign}">
-	            <span class="pmb-header__text">${this.options.title}</span>
-	            <span class="close">×</span>
-					</div>
-	        <div class="pmb-body">
-	            <div class="pmb-content ${this.options.contentAlign}">${this.options.content}</div>
-	        </div>
-	        <div class="pmb-footer"><span class="pmb-btn pmb-btn__cancel">${this.options.cancelText}</span>`;
+			this.tpl = "";
+			if (this.options.type !== "message") {
+				this.options.className += " plugin-message-box-show-mask";
+				this.tpl = `<div class="plugin-message-box-mask"></div>`;
+			}
+			this.tpl += `<div class="plugin-message-box ${this.options.className}"> `;
+      if (this.options.type !== "message") {
+	      this.tpl += `
+          <div class="pmb-header ${this.options.titleAlign}">
+				    <span class="pmb-header__text">${this.options.title}</span>
+				    <span class="close">×</span>
+					</div>`;
+      }
+	    this.tpl += `<div class="pmb-body"><div class="pmb-content ${this.options.contentAlign}">${this.options.content}</div></div>`;
+      this.tpl += `<div class="pmb-footer"><span class="pmb-btn pmb-btn__cancel">${this.options.cancelText}</span>`;
 			this.tpl += `<span class="pmb-btn pmb-btn__confirm">${this.options.confirmText}</span></div></div>`;
+			this.tpl += `</div>`;
 			this.tplStyle = `
-				.plugin-message-box-mask-guohejun {
+				.plugin-message-box-mask {
 			    position: fixed;
 			    top: 0;
 			    left: 0;
@@ -54,17 +61,21 @@
 			    z-index: 900;
 			    background-color: rgba(0,0,0,.5);
 				}
-				.plugin-message-box-guohejun {
+				.plugin-message-box {
 			    position: fixed;
 			    top: 30%;
 			    left: 50%;
 			    transform: translate(-50%, 0);
 			    min-width: 300px;
-			    background-color: #fff;
 			    z-index: 991;
 			    color: #333;
 			    border-radius: 3px;
 			    overflow: hidden;
+	        box-shadow: 0 0 20px 5px rgba(0,0,0,.1);
+				}
+				.plugin-message-box.plugin-message-box-show-mask {
+			    background-color: #fff;
+			    box-shadow: none;
 				}
 				.pmb-header {
 				  position: relative;
@@ -109,13 +120,13 @@
 				  cursor: pointer;
 				}
 				.pmb-btn.pmb-btn__confirm {
-					background-color: #5858d5;
+					background-color: #d23000;
 					color: #fff;
 				}
 			`;
 		},
 		_parseToDom: function (str) {
-			let div = document.createElement("div");
+			var div = document.createElement("div");
 			if (typeof str === "string") {
 				div.innerHTML = str;
 			}
@@ -123,8 +134,8 @@
 		},
 		_appendStyle: function (str) {
 			str = typeof str === "string" ? str : "";
-			let style = document.createElement("style");
-			let head = document.getElementsByTagName("head")[0];
+			var style = document.createElement("style");
+			var head = document.getElementsByTagName("head")[0];
 			style.type = "text/css";
 			if (style.styleSheet) {
 				style.styleSheet.cssText = str;
@@ -134,13 +145,14 @@
 			head.appendChild(style);
 		},
 		show: function (callback) {
-			let _this = this;
+			var _this = this;
 			if (this.hasDom) return;
-			let dom = this._parseToDom(this.tpl);
+			var dom = this._parseToDom(this.tpl);
 			console.log(dom)
 			document.body.appendChild(dom);
 			this._appendStyle(this.tplStyle);
 			this.hasDom = true;
+			return this;
 		}
 	};
 	
