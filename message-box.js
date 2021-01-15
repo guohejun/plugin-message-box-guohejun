@@ -33,14 +33,15 @@
 			};
 			
 			this.options = extend(options, opt, true);
+			this._isSmiple = this.options.type === "message";
 			this.hasDom = false;
 			this.tpl = "";
-			if (this.options.type !== "message") {
+			if (!this._isSmiple) {
 				this.options.className += " plugin-message-box-show-mask";
 				this.tpl = `<div class="plugin-message-box-mask"></div>`;
 			}
 			this.tpl += `<div class="plugin-message-box ${this.options.className}"> `;
-      if (this.options.type !== "message") {
+      if (!this._isSmiple) {
 	      this.tpl += `
           <div class="pmb-header ${this.options.titleAlign}">
 				    <span class="pmb-header__text">${this.options.title}</span>
@@ -48,8 +49,12 @@
 					</div>`;
       }
 	    this.tpl += `<div class="pmb-body"><div class="pmb-content ${this.options.contentAlign}">${this.options.content}</div></div>`;
-      this.tpl += `<div class="pmb-footer"><span class="pmb-btn pmb-btn__cancel">${this.options.cancelText}</span>`;
-			this.tpl += `<span class="pmb-btn pmb-btn__confirm">${this.options.confirmText}</span></div></div>`;
+			if (!this._isSmiple) {
+				this.tpl += `<div class="pmb-footer">`;
+				this.tpl += `<span class="pmb-btn pmb-btn__confirm">${this.options.confirmText}</span>`;
+				this.tpl += `<span class="pmb-btn pmb-btn__cancel">${this.options.cancelText}</span>`;
+				this.tpl += `</div>`;
+			}
 			this.tpl += `</div>`;
 			this.tplStyle = `
 				.plugin-message-box-mask {
@@ -79,8 +84,7 @@
 				}
 				.pmb-header {
 				  position: relative;
-				  height: 44px;
-				  line-height: 44px;
+				  padding-top: 10px;
 				  user-select: none;
 				}
 				.pmb-header.center {
@@ -91,11 +95,9 @@
 				}
 				.pmb-header .close {
 		      position: absolute;
-		      top: 0;
+		      top: 5px;
 		      right: 0;
 		      width: 44px;
-		      height: 44px;
-		      line-height: 44px;
 		      text-align: center;
 		      font-size: 20px;
 		      font-weight: 600;
@@ -103,7 +105,13 @@
 		    }
 				.pmb-body {
 				  color: #666;
-				  padding: 0 20px 10px;
+				  padding: 10px 20px 10px;
+				}
+				.pmb-body .pmb-content.center {
+					text-align: center;
+				}
+				.pmb-body .pmb-content.right {
+					text-align: right;
 				}
 				.pmb-footer {
 				  height: 44px;
